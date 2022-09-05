@@ -107,23 +107,25 @@ def delNodes(G, porcentaje, tam, ini, fin):
 
 #   A STAR
 def a_star_search(graph, initialNode, finalNode, steps = 0):
+    path = []
+    path.append(initialNode)
     #close condition: destination node reached
-    if (initialNode == finalNode):
-        print("Number of nodes visited was {}" .format(steps))
-        return
-    #ask for the neighbors
-    minWeight = 1000000
-    minNeighbor = initialNode
-    for neighbor in graph.neighbors(initialNode):
-        localWeight = graph[initialNode][neighbor]["peso"]    #calculate G(n)
-        localWeight += get_euclidean_distance(graph, initialNode, neighbor) #calculate H(n)
-        if (localWeight < minWeight):
-            minWeight = localWeight
-            minNeighbor = neighbor
-    steps+=1
-    print("->\t{}" . format(minNeighbor))
-    a_star_search(graph, minNeighbor, finalNode, steps)
-    
+    while(initialNode != finalNode):
+        #ask for the neighbors
+        minWeight = 1000000
+        minNeighbor = initialNode
+        for neighbor in graph.neighbors(initialNode):
+            localWeight = graph[initialNode][neighbor]["peso"]    #calculate G(n)
+            localWeight += get_euclidean_distance(graph, neighbor, finalNode) #calculate H(n)
+            if (localWeight < minWeight):
+                minWeight = localWeight
+                minNeighbor = neighbor
+        steps+=1
+        path.append(minNeighbor)
+        initialNode = minNeighbor
+
+    print("Number of nodes visited was {}" .format(steps))
+    return path
 
 #MAIN PROGRAM--------------------------------------------------------------------------
 G = nx.Graph()
@@ -141,14 +143,14 @@ initGrafo(G, tam)
 delNodes(G,porcentaje,tam,inicio,final)
 
 res=[]
-#sorted(graph[start].items(),key=lambda x: getitem(x[1],'peso'))
+
 while(True):
 
     print("Que busqueda deseas realizar: \n")
     print("1. BFS \n")
     print("2. DFS \n")
     print("3. HILL CLIMBING \n")
-    print("4. DFS \n")
+    print("4. A* \n")
     print("5. Salir")
     
     option = int(input("-> "))
@@ -192,7 +194,15 @@ while(True):
 
     #A*
     if(option == 4):
-        a_star_search(G, inicio, final)
+        res = a_star_search(G, inicio, final)
+        color_map = []
+        for node in G:
+            if node in res:
+                color_map.append('red')
+            else: 
+                color_map.append('blue')
+        print(res)
+        nx.draw(G, nx.get_node_attributes(G, 'pos'),node_color = color_map, with_labels=True)
         plt.show()
 
     if(option == 5):
