@@ -1,9 +1,9 @@
 # REQUIRED LIBRARIES-----------------------------------------------------------------------
-from ctypes import sizeof
-from os import remove
+
+
 import networkx as nx
 from matplotlib import pyplot as plt
-import numpy as np
+
 import math
 import sys
 import random
@@ -24,31 +24,31 @@ def get_euclidean_distance(graph, node1, node2):
 # EDUARDO
 def initGrafo(G, num):
     aux = 0
-    for i in range(0,num):
-        if(i == 0):
-            G.add_node(i,pos = (i,aux))
+    for i in range(0, num):
+        if (i == 0):
+            G.add_node(i, pos=(i, aux))
         else:
-            G.add_node(i,pos = (i,aux))
-            G.add_edge(i,i-1, peso = 1)
+            G.add_node(i, pos=(i, aux))
+            G.add_edge(i, i - 1, peso=1)
 
-    for i in range(1,num):
+    for i in range(1, num):
         for j in range(0, num):
-            actual = (num*i) + j
-            if(j == 0):
-                G.add_node(actual, pos = (j, i))
-                G.add_edge(actual, (actual)-num, peso = 2)
-                G.add_edge(actual, (actual)-num + 1, peso = math.sqrt(16))
-            if (j == num-1):
-                G.add_node(actual, pos = (j, i))
-                G.add_edge(actual, (actual)-1, peso = 2)
-                G.add_edge(actual, (actual)-num - 1, peso = math.sqrt(16))
-                G.add_edge(actual, (actual)-num, peso = 2)
-            if(j > 0 and j < num-1):
-                G.add_node(actual, pos = (j, i))
-                G.add_edge(actual, (actual)-1, peso = 2)
-                G.add_edge(actual, (actual)-num - 1, peso = math.sqrt(16))
-                G.add_edge(actual, (actual)-num, peso = 2)
-                G.add_edge(actual, (actual)-num + 1, peso = math.sqrt(16))
+            actual = (num * i) + j
+            if (j == 0):
+                G.add_node(actual, pos=(j, i))
+                G.add_edge(actual, (actual) - num, peso=1)
+                G.add_edge(actual, (actual) - num + 1, peso=math.sqrt(2))
+            if (j == num - 1):
+                G.add_node(actual, pos=(j, i))
+                G.add_edge(actual, (actual) - 1, peso=1)
+                G.add_edge(actual, (actual) - num - 1, peso=math.sqrt(2))
+                G.add_edge(actual, (actual) - num, peso=1)
+            if (j > 0 and j < num - 1):
+                G.add_node(actual, pos=(j, i))
+                G.add_edge(actual, (actual) - 1, peso=1)
+                G.add_edge(actual, (actual) - num - 1, peso=math.sqrt(2))
+                G.add_edge(actual, (actual) - num, peso=1)
+                G.add_edge(actual, (actual) - num + 1, peso=math.sqrt(2))
 
 
 #   Brute force algorithms++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -204,8 +204,7 @@ while (True):
             else:
                 color_map.append('blue')
         print(res)
-        nx.draw(G, nx.get_node_attributes(G, 'pos'),node_color = color_map, with_labels=True)
-        nx.draw_networkx_edge_labels(G, nx.get_node_attributes(G, 'pos'), edge_labels=nx.get_edge_attributes(G, 'peso'))
+        nx.draw(G, nx.get_node_attributes(G, 'pos'), node_color=color_map, with_labels=True)
         plt.show()
 
     if (option == 5):
