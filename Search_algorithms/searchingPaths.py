@@ -18,34 +18,18 @@ def get_euclidean_distance(graph, node1, node2):
 
 # MAIN FUNCTIONS--------------------------------------------------------------------------
 #   Graph Creation++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-# EDUARDO
-def initGrafo(G, num):
-    aux = 0
+def initGrafo(G, num, radiusForConnection):
+    #nodes creation
     for i in range(0,num):
-        if(i == 0):
-            G.add_node(i,pos = (i,aux))
-        else:
-            G.add_node(i,pos = (i,aux))
-            G.add_edge(i,i-1, peso = 1)
-
-    for i in range(1,num):
-        for j in range(0, num):
-            actual = (num*i) + j
-            if(j == 0):
-                G.add_node(actual, pos = (j, i))
-                G.add_edge(actual, (actual)-num, peso = 2)
-                G.add_edge(actual, (actual)-num + 1, peso = math.sqrt(16))
-            if (j == num-1):
-                G.add_node(actual, pos = (j, i))
-                G.add_edge(actual, (actual)-1, peso = 2)
-                G.add_edge(actual, (actual)-num - 1, peso = math.sqrt(16))
-                G.add_edge(actual, (actual)-num, peso = 2)
-            if(j > 0 and j < num-1):
-                G.add_node(actual, pos = (j, i))
-                G.add_edge(actual, (actual)-1, peso = 2)
-                G.add_edge(actual, (actual)-num - 1, peso = math.sqrt(16))
-                G.add_edge(actual, (actual)-num, peso = 2)
-                G.add_edge(actual, (actual)-num + 1, peso = math.sqrt(16))
+        xValue = random.uniform(0.0, 100.0)
+        yValue = random.uniform(0.0, 100.0)
+        G.add_node(i, pos = (xValue, yValue))
+        
+    #edges creation
+    for i in range(0,num):
+        for j in range(i+1, num):
+            if (get_euclidean_distance(G, i, j) <= radiusForConnection):
+                G.add_edge(i, j, peso = get_euclidean_distance(G, i, j))
 
 
 #   Brute force algorithms++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -128,18 +112,19 @@ def a_star_search(graph, initialNode, finalNode, steps=0):
 
 # MAIN PROGRAM--------------------------------------------------------------------------
 G = nx.Graph()
-print("Elige el tamaño del grafo: ")
+print("NUMBER OF NODES: ")
 tam = int(input())
-print("Escribe en que nodo inicia la busqueda del 0 al {}".format(tam * tam))
+print("RADIUS FOR CONNECT THE NODES: ")
+radiusForConnection = int(input())
+print("Escribe en que nodo inicia la busqueda del 0 al {}".format(tam))
 inicio = int(input())
-print("Escribe en que nodo termina la busqueda del 0 al {}".format(tam * tam))
+print("Escribe en que nodo termina la busqueda del 0 al {}".format(tam))
 final = int(input())
-print("Escribe el porcentaje de nodos que quieres eliminar:")
-porcentaje = int(input())
-## RECIBE EL GRAFO Y N PARA CREAR UN GRAFO DE N * N
-initGrafo(G, tam)
 
-delNodes(G, porcentaje, tam, inicio, final)
+## RECIBE EL GRAFO Y N PARA CREAR UN GRAFO DE N * N
+initGrafo(G, tam, radiusForConnection)
+
+
 
 res = []
 
@@ -162,7 +147,7 @@ while (True):
             else:
                 color_map.append('blue')
         print(res)
-        nx.draw(G, nx.get_node_attributes(G, 'pos'), node_color=color_map, with_labels=True)
+        nx.draw(G, nx.get_node_attributes(G, 'pos'), node_color=color_map, with_labels=False)
         plt.show()
 
     if (option == 2):
@@ -202,7 +187,6 @@ while (True):
                 color_map.append('blue')
         print(res)
         nx.draw(G, nx.get_node_attributes(G, 'pos'),node_color = color_map, with_labels=True)
-        nx.draw_networkx_edge_labels(G, nx.get_node_attributes(G, 'pos'), edge_labels=nx.get_edge_attributes(G, 'peso'))
         plt.show()
 
     if (option == 5):
