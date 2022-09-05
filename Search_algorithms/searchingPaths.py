@@ -12,12 +12,15 @@ import os
 #AUXILIARY FUNCTIONS---------------------------------------------------------------------
 sys.setrecursionlimit(5000) #new max depth for interpreter stack
 
-def get_euclidean_distance(node1, node2):
-    (x1, y1) = node1
-    (x2, y2) = node2
-    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+def get_euclidean_distance(graph, node1, node2):
+    
+    (x1, y1) = nx.get_node_attributes(graph, 'pos')[node1]
+    (x2, y2) = nx.get_node_attributes(graph, 'pos')[node2]
+    return (((x2 - x1)**2 + (y2 - y1)**2)**0.5)
 
 #MAIN FUNCTIONS--------------------------------------------------------------------------
+#   Graph Creation++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#EDUARDO
 def initGrafo(G, num):
     aux = 0
     for i in range(0,num):
@@ -46,25 +49,8 @@ def initGrafo(G, num):
                 G.add_edge(actual, (actual)-num, peso = 1)
                 G.add_edge(actual, (actual)-num + 1, peso = math.sqrt(2))
 
-#Best First Search
-def Best_First_Search(start, target, graph, res, queue = [], visited = []):
-    if start not in visited:
-        res.append(start)
-        visited.append(start)
-
-    queue = queue + [x for x in graph[start].items() if x[0] not in visited]
-    queue.sort(key=lambda x:x[1]['peso'])
-
-    if queue[0][0] == target:
-        res.append(queue[0][0])
-        # print("entro fin")
-    else:
-        pricessing = queue[0]
-        queue.remove(pricessing)
-        # print("entro else")
-        Best_First_Search(pricessing[0], target, graph, res, queue, visited)
-
-#DFS
+#   Brute force algorithms++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#   DFS
 def dfs(start, target, graph):
         
     path = [[start]]
@@ -86,7 +72,7 @@ def dfs(start, target, graph):
     print('El camino no existe' %(start, target))
 
 
-#BFS
+#   BFS
 def bfs1(start, target, graph):
     
     path = [[start]]
@@ -115,8 +101,31 @@ def delNodes(G, porcentaje, tam, ini, fin):
         if(i != ini and i != fin):
             G.remove_node(i)
 
-#MAIN PROGRAM--------------------------------------------------------------------------
+#   Heuristics algorithms++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#   HILL CLIMBING
 
+
+#   A STAR
+def a_star_search(graph, initialNode, finalNode, steps = 0):
+    #close condition: destination node reached
+    if (initialNode == finalNode):
+        print("Number of nodes visited was {}" .format(steps))
+        return
+    #ask for the neighbors
+    minWeight = 1000000
+    minNeighbor = initialNode
+    for neighbor in graph.neighbors(initialNode):
+        localWeight = graph[initialNode][neighbor]["peso"]    #calculate G(n)
+        localWeight += get_euclidean_distance(graph, initialNode, neighbor) #calculate H(n)
+        if (localWeight < minWeight):
+            minWeight = localWeight
+            minNeighbor = neighbor
+    steps+=1
+    print("->\t{}" . format(minNeighbor))
+    a_star_search(graph, minNeighbor, finalNode, steps)
+    
+
+#MAIN PROGRAM--------------------------------------------------------------------------
 G = nx.Graph()
 print("Elige el tamaño del grafo: ")
 tam = int(input())
@@ -136,28 +145,14 @@ res=[]
 while(True):
 
     print("Que busqueda deseas realizar: \n")
-    print("1. Best First Search \n")
-    print("2. A* \n")
-    print("3. BFS \n")
+    print("1. BFS \n")
+    print("2. DFS \n")
+    print("3. HILL CLIMBING \n")
     print("4. DFS \n")
     print("5. Salir")
     
     option = int(input("-> "))
-
     if(option == 1):
-        Best_First_Search(inicio, final, G, res)
-        color_map = []
-        for node in G:
-            if node in res:
-                color_map.append('red')
-            else: 
-                color_map.append('blue')
-        print("Cantidad de Pasos -> {}" .format(len(res)))
-        print(res)
-        nx.draw(G, nx.get_node_attributes(G, 'pos'),node_color = color_map, with_labels=True)
-        plt.show()
-
-    if(option == 3):
         res = bfs1(inicio, final, G)
         color_map = []
         for node in G:
@@ -169,7 +164,7 @@ while(True):
         nx.draw(G, nx.get_node_attributes(G, 'pos'),node_color = color_map, with_labels=True)
         plt.show()
 
-    if(option == 4):
+    if(option == 2):
         res = dfs(inicio, final, G)
         color_map = []
         for node in G:
@@ -180,6 +175,26 @@ while(True):
         print(res)
         nx.draw(G, nx.get_node_attributes(G, 'pos'),node_color = color_map, with_labels=True)
         plt.show()
+
+    #HILL CLIMBING
+    if(option == 3):
+        #HILL CLIMBING algorithm here
+        color_map = []
+        for node in G:
+            if node in res:
+                color_map.append('red')
+            else: 
+                color_map.append('blue')
+        print("Cantidad de Pasos -> {}" .format(len(res)))
+        print(res)
+        nx.draw(G, nx.get_node_attributes(G, 'pos'),node_color = color_map, with_labels=True)
+        plt.show()
+
+    #A*
+    if(option == 4):
+        a_star_search(G, inicio, final)
+        plt.show()
+
     if(option == 5):
         break
     os.system('cls' if os.name == 'nt' else 'clear')
