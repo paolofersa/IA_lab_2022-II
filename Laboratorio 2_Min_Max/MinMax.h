@@ -168,10 +168,18 @@ struct MinMaxTree{
 						vect[i][j]=2;
 				}				
 			}
-			if(turn)//player turn
-				return (posib_nxn(vec,turn+1) - posib_nxn(vec,turn));
-			else
-				return (posib_nxn(vec,turn+1) - posib_nxn(vec,turn + 2));
+			if(actual->height % 2 == 0){
+				if(turn)//player turn
+					return (posib_nxn(vec,turn) - posib_nxn(vec,turn+1));
+				else
+					return (posib_nxn(vec,turn + 2) - posib_nxn(vec,turn+1));
+			}
+			else{
+				if(turn)//player turn
+					return (posib_nxn(vec,turn+1) - posib_nxn(vec,turn));
+				else
+					return (posib_nxn(vec,turn+1) - posib_nxn(vec,turn + 2));
+			}			
 		}
 		//#posibilities
 		for (size_t i = 0; i < 3; i++)
