@@ -140,22 +140,15 @@ void OnMouseClick(int button, int state, int x, int y)
 
 void elegirTurno()
 {
-	string turn, dif;
-	cout << "Elega el turno\n"
+	string turn;
+	int dif;
+	cout << "Elija el turno\n"
 		<< "1. Jugador\n"
 		<< "2. Maquina\n";
 	cin >> turn;
-	cout << "Elega la dificultad\n"
-		<< "1. Facil\n"
-		<< "2. Medio\n"
-		<< "3. Dificil\n";
+	cout << "Escriba una profundidad\n";
 	cin >> dif;
-	if (dif == "1")
-		profundidad = 3;
-	else if (dif == "2")
-		profundidad = 6;
-	else
-		profundidad = 9;
+	profundidad = dif;
 	
 	maquina.setProf(profundidad);
 	if (turn == "2")
