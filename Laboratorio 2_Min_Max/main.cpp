@@ -19,8 +19,53 @@
 #define PI 3.14159265358979323846
 #define radius 70
 
+#define colorRed glColor3f(1, 0, 0)
+#define colorYellow glColor3f(1, 0.843, 0)
+#define colorPurple glColor3f(0.502, 0.000, 0.502)
+#define colorGreen glColor3f(0, 0.502, 0)
+#define colorBlue glColor3f(0, 0, 0.804)
+#define colorBlack glColor3f(0, 0, 0)
+#define colorWhite glColor3f(1, 1, 1)
+
 #define width 800
 #define height 600
+
+
+#include <stdlib.h>
+
+bool turno = true; // 0 = maquina, 1 = jugador
+int ganador = -1;
+
+int profundidad = 0;
+MinMax maquina(0);
+Tablero tablero(width, height);
+
+void elegirTurno();
+
+void restartGame()
+{
+	system("cls");
+	tablero.reset();
+	ganador = -1;
+	turno = 1;
+	elegirTurno();
+}
+
+GLvoid window_key(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	case KEY_ESC:
+		exit(0);
+		break;
+	case KEY_R: /// Restart
+		restartGame();
+		break;
+	default:
+		break;
+	}
+	glutPostRedisplay();
+}
 
 void reshape_cb(int w, int h)
 {
@@ -29,17 +74,13 @@ void reshape_cb(int w, int h)
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
+	glutKeyboardFunc(&window_key);
 	gluOrtho2D(0, w, 0, h);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
 
-int profundidad = 0;
-MinMax maquina(0);
-Tablero tablero(width, height);
 
-// int tablero[3][3] = {{-1,-1,-1},{-1,-1,-1},{-1,-1,-1}};
-bool turno = true; // 0 = maquina, 1 = jugador
 
 void display_cb()
 {
@@ -52,7 +93,6 @@ void display_cb()
 	glutSwapBuffers();
 }
 
-int ganador = -1;
 
 void checkGanador()
 {
@@ -112,10 +152,10 @@ void checkGanador()
 		ganador = 0;
 	}
 	
-	if(ganador == 0)		
-		cout<<"El ganador es la maquina\n";
-	else if(ganador == 1)
-		cout<<"El ganador es el jugador\n";
+	if (ganador == 0)
+		cout << "El ganador es la maquina\n";
+	else if (ganador == 1)
+		cout << "El ganador es el jugador\n";
 }
 
 void OnMouseClick(int button, int state, int x, int y)
@@ -133,7 +173,7 @@ void OnMouseClick(int button, int state, int x, int y)
 			
 			checkGanador();
 		}
-		//std::cout << x << " " << y << std::endl;
+		// std::cout << x << " " << y << std::endl;
 	}
 	glutPostRedisplay();
 }
@@ -146,7 +186,8 @@ void elegirTurno()
 		<< "1. Jugador\n"
 		<< "2. Maquina\n";
 	cin >> turn;
-	cout << "Escriba una profundidad\n";
+	
+	cout << "Elija la profundidad\n";
 	cin >> dif;
 	profundidad = dif;
 	
@@ -159,11 +200,11 @@ void elegirTurno()
 void initialize()
 {
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE); // 255 or 0-1 float
-	glutInitWindowSize(width, height);            // width, height de la ventana
-	glutInitWindowPosition(100, 100);             // incio ventana
-	glutCreateWindow("Ventana OpenGL");           // crea la ventana en base a las anteriores
-	glutDisplayFunc(display_cb);                  // Funcion que dibuja en la ventana
-	glutReshapeFunc(reshape_cb);                  // Resize de la ventana
+	glutInitWindowSize(width, height);						// width, height de la ventana
+	glutInitWindowPosition(100, 100);							// incio ventana
+	glutCreateWindow("Ventana OpenGL");						// crea la ventana en base a las anteriores
+	glutDisplayFunc(display_cb);									// Funcion que dibuja en la ventana
+	glutReshapeFunc(reshape_cb);									// Resize de la ventana
 	glutMouseFunc(&OnMouseClick);
 	glClearColor(0.f, 0.f, 0.f, 0.f); // blanco en la ventana al limpiar buffer
 }
@@ -172,7 +213,7 @@ int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
 	elegirTurno();
-	initialize();   // funcion importante
+	initialize();		// funcion importante
 	glutMainLoop(); // ejecuta display
 	return 0;
 }
