@@ -10,16 +10,16 @@
 
 using namespace std;
 //FUNCTIONS TO FIND POSIBILITIES
-bool d1=false,d2=false;
-map <int,int> v,h;
 
 
 int posib_nxn (vector<vector<int>> vec, int n);
-void check_h (vector<vector<int>> vec, int n,int x, int &cont);
-void check_v (vector<vector<int>> vec, int n,int y,int &cont);
-void check_d1 (vector<vector<int>> vec, int n,int &cont);
-void check_d2 (vector<vector<int>> vec, int n,int &cont);
+void check_h (vector<vector<int>> vec, int n,int x, int &cont,map<int,int>v,map<int,int>h,bool &d1,bool &d2);
+void check_v (vector<vector<int>> vec, int n,int y,int &cont,map<int,int>v,map<int,int>h,bool &d1,bool &d2);
+void check_d1 (vector<vector<int>> vec, int n,int &cont,map<int,int>v,map<int,int>h, bool &d1);
+void check_d2 (vector<vector<int>> vec, int n,int &cont,map<int,int>v,map<int,int>h,bool &d1,bool &d2);
 int posib_nxn (vector<vector<int>> vec, int n){
+	bool d1=false,d2=false;
+	map <int,int> v,h;
     list<int> a;
     int total = vec.size()*2+2;
     int cont = 0;
@@ -27,16 +27,16 @@ int posib_nxn (vector<vector<int>> vec, int n){
     for (int i=0; i<vec.size(); i++) {
         for (int j=0; j<vec.size(); j++) {
             if (vec[i][j]== 3-n){
-                if (h.find(i)==h.end())check_h(vec,n,i,cont);
-                if (v.find(j)==v.end())check_v(vec,n,j,cont);
-                if (i==j&&!d1) check_d1(vec,n,cont);
-                if (i+j==vec.size()-1&&!d2) check_d2(vec,n,cont);
+                if (h.find(i)==h.end())check_h(vec,n,i,cont,v,h,d1,d2);
+                if (v.find(j)==v.end())check_v(vec,n,j,cont,v,h,d1,d2);
+                if (i==j&&!d1) check_d1(vec,n,cont,v,h,d1,d2);
+                if (i+j==vec.size()-1&&!d2) check_d2(vec,n,cont,v,h,d2);
             } 
         }
     }
     return total-cont;
 }
-void check_h (vector<vector<int>> vec, int n,int x,int &cont){
+void check_h (vector<vector<int>> vec, int n,int x,int &cont,map<int,int>v,map<int,int>h){
     list <int>a;
     list <int>::iterator it;
     cout<<"h"<<endl;
@@ -50,12 +50,12 @@ void check_h (vector<vector<int>> vec, int n,int x,int &cont){
     }
     if (a.empty()) return;
     for (it = a.begin(); it!=a.end();it++){
-        if (v.find(*it)==v.end())check_v(vec,n,*it,cont);
-        if (x==*it&&!d1) check_d1(vec,n,cont);
-        if (*it+x==vec.size()-1&&!d2) check_d2(vec,n,cont);
+        if (v.find(*it)==v.end())check_v(vec,n,*it,cont,v,h);
+        if (x==*it&&!d1) check_d1(vec,n,cont,v,h);
+        if (*it+x==vec.size()-1&&!d2) check_d2(vec,n,cont,v,h);
     }
 }
-void check_v (vector<vector<int>> vec, int n,int y,int &cont){
+void check_v (vector<vector<int>> vec, int n,int y,int &cont,map<int,int>v,map<int,int>h){
     list <int>a;
     list <int>::iterator it;
     cout<<"v"<<endl;
@@ -69,12 +69,12 @@ void check_v (vector<vector<int>> vec, int n,int y,int &cont){
     }
     if (a.empty()) return;
     for (it = a.begin(); it!=a.end();it++){
-        if (h.find(*it)==h.end())check_h(vec,n,*it,cont);
-        if (y==*it&&!d1) check_d1(vec,n,cont);
-        if (*it+y==vec.size()-1&&!d2) check_d2(vec,n,cont);
+        if (h.find(*it)==h.end())check_h(vec,n,*it,cont,v,h);
+        if (y==*it&&!d1) check_d1(vec,n,cont,v,h);
+        if (*it+y==vec.size()-1&&!d2) check_d2(vec,n,cont,v,h);
     }
 }
-void check_d1 (vector<vector<int>> vec, int n,int &cont){
+void check_d1 (vector<vector<int>> vec, int n,int &cont,map<int,int>v,map<int,int>h){
     list <int>a;
     list <int>::iterator it;
     cout<<"d1"<<endl;
@@ -88,13 +88,13 @@ void check_d1 (vector<vector<int>> vec, int n,int &cont){
     }
     if (a.empty()) return;
     for (it = a.begin(); it!=a.end();it++){
-        if (h.find(*it)==h.end())check_h(vec,n,*it,cont);
-        if (v.find(*it)==v.end())check_v(vec,n,*it,cont);
-        if (*it*2==vec.size()-1&&!d2) check_d2(vec,n,cont);
+        if (h.find(*it)==h.end())check_h(vec,n,*it,cont,v,h);
+        if (v.find(*it)==v.end())check_v(vec,n,*it,cont,v,h);
+        if (*it*2==vec.size()-1&&!d2) check_d2(vec,n,cont,v,h);
     }
     
 }
-void check_d2 (vector<vector<int>> vec, int n,int &cont){
+void check_d2 (vector<vector<int>> vec, int n,int &cont,map<int,int>v,map<int,int>h){
     list <int>a;
     list <int>::iterator it;
     cout<<"d2"<<endl;
@@ -108,35 +108,35 @@ void check_d2 (vector<vector<int>> vec, int n,int &cont){
     }
     if (a.empty()) return;
     for (it = a.begin(); it!=a.end();it++){
-        if (h.find(*it)==h.end())check_h(vec,n,*it,cont);
-        if (v.find(vec.size()-*it)==v.end())check_v(vec,n,vec.size()-*it,cont);
-        if (*it==vec.size()-(*it+1)&&!d2) check_d2(vec,n,cont);
+        if (h.find(*it)==h.end())check_h(vec,n,*it,cont,v,h);
+        if (v.find(vec.size()-*it)==v.end())check_v(vec,n,vec.size()-*it,cont,v,h);
+        if (*it==vec.size()-(*it+1)&&!d2) check_d2(vec,n,cont,v,h);
     }
 }
 
 //FOR MINIMAX
-struct Node;
+struct MinMaxNode;
 
-struct Node {
+struct MinMaxNode {
 	Tablero tablero;
 	bool estado;
 	int height;	//ESTADO-> 0:MAX, 1:MIN			HEIGHT->0,1...
 	int nodeScore;
 	int selectedChild;
 	int colChanged, rowChanged;	//index of the col and row that has been changed
-	Node *back; /// padre
-	vector<Node *> nodes;
+	MinMaxNode *back; /// padre
+	vector<MinMaxNode *> nodes;
 	
-	Node(int height, Node *back, Tablero tablero) {
+	MinMaxNode(int height, MinMaxNode *back, Tablero tablero) {
 		this->height = height;
 		this->back = back;
 		this->tablero = tablero;
 		estado = 0;
 	}
 	
-	~Node () {
+	~MinMaxNode () {
 		while ( !nodes.empty () ) {
-			Node *node = nodes.back ();
+			MinMaxNode *node = nodes.back ();
 			delete node;
 			nodes.pop_back ();
 		}
@@ -146,14 +146,14 @@ struct Node {
 
 struct MinMaxTree{
 	int maxHeight;
-	Node *root;
+	MinMaxNode *root;
 	
 	MinMaxTree(int maxHeight, Tablero tableroInicial) {
 		this->maxHeight = maxHeight;
-		root = new Node(0, nullptr, tableroInicial);
+		root = new MinMaxNode(0, nullptr, tableroInicial);
 	}
 	
-	int createTree(Node* actual, int turn){
+	int createTree(MinMaxNode* actual, int turn){
 		//stop condition if the max height is reached
 		if(actual->height == maxHeight){
 			//find value for leafs
@@ -188,10 +188,10 @@ struct MinMaxTree{
 			{
 				//empty block
 				if(actual->tablero.casillas[i][j] == -1){
-					//create a new node
+					//create a new MinMaxNode
 					Tablero tempTablero = actual->tablero;
 					tempTablero[i][j] = turn;
-					Node *newNode = new Node(actual->height + 1, actual, tempTablero);
+					MinMaxNode *newNode = new MinMaxNode(actual->height + 1, actual, tempTablero);
 					newNode->rowChanged = i;
 					newNode->colChanged = j;
 					newNode->estado = !(actual->estado);
@@ -233,7 +233,7 @@ struct MinMaxTree{
 	}
 	
 	
-	void generalArbol(Node *actual, int turno) {
+	void generalArbol(MinMaxNode *actual, int turno) {
 		//capturar Tablero.casillas
 		//	convertir matriz a vector de vectores
 		/*
