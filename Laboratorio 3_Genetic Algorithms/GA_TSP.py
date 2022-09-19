@@ -1,3 +1,5 @@
+from ast import If
+import string
 import numpy as np
 import random
 import operator
@@ -157,6 +159,13 @@ def GA(population, popSize, eliteSize, mutationRate, generations):
     return bestRoute
 
 ########################################## main ################################################################
+print("--------------------TSP PROBLEM--------------------")
+print("Define number of INDIVIDUALS:\t")
+individuals = int(input())
+print("Define number of ITERATIONS:\t")
+iterations = int(input())
+
+
 cityList = []
 edge_colors=[]
 positions=[]
@@ -170,22 +179,37 @@ for i in range(0,nroCities):
     positions.append((x,y))
 
 G.add_nodes_from(cityList)
-bestRoute = GA(population=cityList, popSize=80, eliteSize=20, mutationRate=0.10, generations=500)
+bestRoute = GA(population=cityList, popSize=individuals, eliteSize=20, mutationRate=0.10, generations=iterations)
 bestRoute.append(bestRoute[0])
 
 for i in range(0,nroCities):
     for j in range(0,nroCities):
         edge_colors.append('b')
-        G.add_edge(cityList[i],cityList[j])
+        if(i != j):
+            G.add_edge(cityList[i],cityList[j])
         
 weights = nx.get_edge_attributes(G,'weight').values()
 plt.figure(2)
 nx.draw(G,edge_color=edge_colors)
 plt.show()
 
-for i in range(0,nroCities):
-    x=bestRoute[i].x
-    y=bestRoute[i].y
-    x_2=bestRoute[i+1].x
-    y_2=bestRoute[i+1].y
-    print("Route: (",x,",",y,")->(",x_2,",",y_2,")")
+print("Visualize route optimized by GENETIC ALGORITHM? (0/1)")
+condition = int(input())
+if (condition):
+    for i in range(0,nroCities):
+        x=bestRoute[i].x
+        y=bestRoute[i].y
+        x_2=bestRoute[i+1].x
+        y_2=bestRoute[i+1].y
+        print("Route: (",x,",",y,")->(",x_2,",",y_2,")")
+    G2 = nx.Graph()
+    #create nodes
+    for i in range (0, nroCities):
+        G2.add_node(i, pos = (bestRoute[i].x, bestRoute[i].y))
+    #create edges
+    for i in range(0, nroCities-1):
+        G2.add_edge(i, i+1)
+    plt.figure(3)
+    nx.draw(G2, nx.get_node_attributes(G2, 'pos'))
+    plt.show()
+    
