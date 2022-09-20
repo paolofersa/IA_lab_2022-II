@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
 import math
+from random import randint, choice
 
 class City:
     def __init__(self, x, y):
@@ -66,14 +67,14 @@ def routeRanking(population):
         fitnessResults[i] = Fitness(population[i]).routeFitness()
     return sorted(fitnessResults.items(), key = operator.itemgetter(1), reverse = True)
 
-def selection(popRanked, eliteSize):
+def selection(popRanked):
     selectionResults = []
     df = pd.DataFrame(np.array(popRanked), columns=["Idx","Fitness"])
     df['cum_sum'] = df.Fitness.cumsum()
     df['cum_perc'] = 100*df.cum_sum/df.Fitness.sum()
-    for i in range(0, eliteSize):
+    for i in range(0, 10):
         selectionResults.append(popRanked[i][0])
-    for i in range(0, len(popRanked) - eliteSize):
+    for i in range(0, len(popRanked) - 10):
         pick = 100*random.random()
         for i in range(0, len(popRanked)):
             if pick <= df.iat[i,3]:
@@ -89,6 +90,37 @@ def finalSelection(population, selectionResults):
     return matingpool
 
 def crossing(parent1, parent2):
+    '''
+    child = []
+    childP1 = []
+    binary = []
+    if (parent1 ==parent2):
+        return parent1
+    binary.append(0)
+    for i in range (1,len(parent1)):
+        binary.append(round(random.random()))
+    for i in range (len(binary)):
+        if(binary[i]==1):
+            childP1.append(parent2[i])
+    temp = 0
+    temp1 = 0
+    for i in range (len(parent1)):
+        if(binary[i]==1):
+            child.append(childP1[temp])
+            temp = temp+1
+        else:
+            ingresado = False
+            while ((temp1<len(parent1)) and (not ingresado)):
+                if(parent1[temp1] not in childP1):
+                    child.append(parent1[temp1])
+                    ingresado = True
+                else:
+                    temp1 = temp1 + 1
+            if (ingresado == False):
+                child.append(City(x=int(random.random()*((parent1[i].x+parent2[i].x))), y=int(random.random()*((parent2[i].y+parent1[i].y)))))
+    return child
+    
+    '''
     child = []
     childP1 = []
     childP2 = []
@@ -96,63 +128,85 @@ def crossing(parent1, parent2):
     partB = int(random.random() * len(parent1))
     ini = min(partA, partB)
     end = max(partA, partB)
+    binary = []
+    for i in range (0, len(parent1)):
+        binary.append(randint(0,1))
+
     for i in range(ini, end):
         childP1.append(parent1[i])
     childP2 = [item for item in parent2 if item not in childP1]
     child = childP1 + childP2
     return child
+    
 
-def crossingPopulation(matingpool, eliteSize):
+def crossingPopulation(matingpool):
     children = []
-    length = len(matingpool) - eliteSize
+    length = len(matingpool) - 10
     pool = random.sample(matingpool, len(matingpool))
-    for i in range(0,eliteSize):
+    for i in range(0,10):
         children.append(matingpool[i])
     for i in range(0, length):
         child = crossing(pool[i], pool[len(matingpool)-i-1])
         children.append(child)
     return children
 
-def mutate(individual, mutationRate):
-    for aux1 in range(len(individual)):
-        if(random.random() < mutationRate):
-            aux2 = int(random.random() * len(individual))
-            c1 = individual[aux1]
-            c2 = individual[aux2]
-            individual[aux1] = c2
-            individual[aux2] = c1
+def mutate(individual):
+    for aux1 in range(len(individual)):        
+        aux2 = int(random.random() * len(individual))
+        c1 = individual[aux1]
+        c2 = individual[aux2]
+        individual[aux1] = c1
+        individual[aux2] = c2
     return individual
 
-def mutatePopulation(population, mutationRate):
+def mutatePopulation(population):
     mutatedPop = []
     for ind in range(0, len(population)):
-        mutatedInd = mutate(population[ind], mutationRate)
+        mutatedInd = mutate(population[ind])
         mutatedPop.append(mutatedInd)
     return mutatedPop
 
-def nextGeneration(currentGen, eliteSize, mutationRate):
+def nextGeneration(currentGen):
     popRanked = routeRanking(currentGen)
-    selectionResults = selection(popRanked, eliteSize)
+    selectionResults = selection(popRanked)
     matingpool = finalSelection(currentGen, selectionResults)
-    children = crossingPopulation(matingpool, eliteSize)
-    nextGeneration = mutatePopulation(children, mutationRate)
+    children = crossingPopulation(matingpool)
+    nextGeneration = mutatePopulation(children)
     return nextGeneration
 
-def GA(population, popSize, eliteSize, mutationRate, generations):
+def GA(population, popSize, generations):
     pop = initialPopulation(popSize, population)
     progress = []
+    min_values = []
     bestRoute=[]
     best_distance= math.inf
     progress.append(1 / routeRanking(pop)[0][1])
+    min_values.append(1 / routeRanking(pop)[-1][1])
     for i in range(0, generations):
-        pop = nextGeneration(pop, eliteSize, mutationRate)
+        pop = nextGeneration(pop)
         actual_best_distance = 1 / routeRanking(pop)[0][1]
         progress.append(actual_best_distance)
+        min_values.append(1/routeRanking(pop)[-1][1])
         if(best_distance == math.inf or actual_best_distance<best_distance):
             bestRoute = pop[routeRanking(pop)[0][0]]
+
+        G2 = nx.Graph()
+        #create nodes
+        for i in range (0, 20):
+            G2.add_node(i, pos = (bestRoute[i].x, bestRoute[i].y))
+        #create edges
+        for i in range(0, 20-1):
+            G2.add_edge(i, i+1)
+        plt.figure(1)
+        nx.draw(G2, nx.get_node_attributes(G2, 'pos'))
+        plt.show(block = False)
+        plt.pause(.1)
+        plt.clf()
     #print(progress[0])
-    plt.figure()
-    plt.plot(progress)
+    plt.figure(2)
+    plt.plot(progress, 'g', label = 'Best case')
+    plt.plot(min_values, 'r', label = 'Worst case')
+    plt.legend()
     plt.ylabel('Distancia')
     plt.xlabel('Generacion')
     #bestRoute = pop[routeRanking(pop)[0][0]]
@@ -179,7 +233,7 @@ for i in range(0,nroCities):
     positions.append((x,y))
 
 G.add_nodes_from(cityList)
-bestRoute = GA(population=cityList, popSize=individuals, eliteSize=20, mutationRate=0.10, generations=iterations)
+bestRoute = GA(population=cityList, popSize=individuals, generations=iterations)
 bestRoute.append(bestRoute[0])
 
 for i in range(0,nroCities):
@@ -189,7 +243,7 @@ for i in range(0,nroCities):
             G.add_edge(cityList[i],cityList[j])
         
 weights = nx.get_edge_attributes(G,'weight').values()
-plt.figure(2)
+plt.figure(3)
 nx.draw(G,edge_color=edge_colors)
 plt.show()
 
@@ -209,7 +263,7 @@ if (condition):
     #create edges
     for i in range(0, nroCities-1):
         G2.add_edge(i, i+1)
-    plt.figure(3)
+    plt.figure(4)
     nx.draw(G2, nx.get_node_attributes(G2, 'pos'))
     plt.show()
     
