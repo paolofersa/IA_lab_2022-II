@@ -89,65 +89,42 @@ def finalSelection(population, selectionResults):
         matingpool.append(population[index])
     return matingpool
 
-def crossing(parent1, parent2):
-    '''
-    child = []
-    childP1 = []
+def crossing(parent1, parent2):    
     binary = []
-    if (parent1 ==parent2):
-        return parent1
-    binary.append(0)
-    for i in range (1,len(parent1)):
-        binary.append(round(random.random()))
-    for i in range (len(binary)):
-        if(binary[i]==1):
-            childP1.append(parent2[i])
-    temp = 0
-    temp1 = 0
-    for i in range (len(parent1)):
-        if(binary[i]==1):
-            child.append(childP1[temp])
-            temp = temp+1
-        else:
-            ingresado = False
-            while ((temp1<len(parent1)) and (not ingresado)):
-                if(parent1[temp1] not in childP1):
-                    child.append(parent1[temp1])
-                    ingresado = True
-                else:
-                    temp1 = temp1 + 1
-            if (ingresado == False):
-                child.append(City(x=int(random.random()*((parent1[i].x+parent2[i].x))), y=int(random.random()*((parent2[i].y+parent1[i].y)))))
-    return child
-    
-    '''
-    child = []
-    childP1 = []
-    childP2 = []
-    partA = int(random.random() * len(parent1))
-    partB = int(random.random() * len(parent1))
-    ini = min(partA, partB)
-    end = max(partA, partB)
-    binary = []
+    child1 = [None] * len(parent1)
+    child2 = [None] * len(parent2)
+    #create the mask
     for i in range (0, len(parent1)):
         binary.append(randint(0,1))
+        #fill with initial values
+        if(binary[i] == 1):
+            child1[i] = parent2[i]
+            child2[i] = parent1[i]
+    #fill empty values
+    counterC1 = counterC2 = 0
+    for i in range (0, len(parent1)):
+        if(parent1[i] not in child1):
+            while(counterC1 < len(parent1) and binary[counterC1] == 1):
+                counterC1+=1
+            child1[counterC1] = parent1[i]
+            counterC1+=1
+        if(parent2[i] not in child2):
+            while(counterC2 < len(parent1) and binary[counterC2] == 1):
+                counterC2+=1
+            child2[counterC2] = parent2[i]
+            counterC2+=1
 
-    for i in range(ini, end):
-        childP1.append(parent1[i])
-    childP2 = [item for item in parent2 if item not in childP1]
-    child = childP1 + childP2
-    return child
+    return child1, child2
     
 
 def crossingPopulation(matingpool):
     children = []
-    length = len(matingpool) - 10
-    pool = random.sample(matingpool, len(matingpool))
-    for i in range(0,10):
-        children.append(matingpool[i])
+    length = int(len(matingpool)/2)
+    pool = random.sample(matingpool, len(matingpool))    
     for i in range(0, length):
-        child = crossing(pool[i], pool[len(matingpool)-i-1])
-        children.append(child)
+        child1, child2 = crossing(pool[i], pool[len(matingpool)-i-1])
+        children.append(child1)
+        children.append(child2)
     return children
 
 def mutate(individual):
@@ -199,6 +176,7 @@ def GA(population, popSize, generations):
             G2.add_edge(i, i+1)
         plt.figure(1)
         nx.draw(G2, nx.get_node_attributes(G2, 'pos'))
+        plt.title("Generation {}".format(i))
         plt.show(block = False)
         plt.pause(.1)
         plt.clf()
@@ -263,6 +241,7 @@ if (condition):
     #create edges
     for i in range(0, nroCities-1):
         G2.add_edge(i, i+1)
+    G2.add_edge(nroCities-1, 0)
     plt.figure(4)
     nx.draw(G2, nx.get_node_attributes(G2, 'pos'))
     plt.show()
