@@ -157,13 +157,20 @@ def GA(population, popSize, generations):
     min_values = []
     bestRoute=[]
     best_distance= math.inf
-    progress.append(1 / routeRanking(pop)[0][1])
+    sum = 0
+    mean_values_l=[]
+    mean_value = 0
     min_values.append(1 / routeRanking(pop)[-1][1])
     for i in range(0, generations):
+
+        for i in range (0, len(pop)):
+            sum += (1 / routeRanking(pop)[i][1])
+
         pop = nextGeneration(pop)
         actual_best_distance = 1 / routeRanking(pop)[0][1]
         progress.append(actual_best_distance)
         min_values.append(1/routeRanking(pop)[-1][1])
+
         if(best_distance == math.inf or actual_best_distance<best_distance):
             bestRoute = pop[routeRanking(pop)[0][0]]
 
@@ -174,16 +181,23 @@ def GA(population, popSize, generations):
         #create edges
         for i in range(0, 20-1):
             G2.add_edge(i, i+1)
+        mean_value = sum/len(pop)
+        sum = 0
+        mean_values_l.append(mean_value)
+    
         plt.figure(1)
         nx.draw(G2, nx.get_node_attributes(G2, 'pos'))
         plt.title("Generation {}".format(i))
         plt.show(block = False)
         plt.pause(.1)
         plt.clf()
+
+
     #print(progress[0])
     plt.figure(2)
     plt.plot(progress, 'g', label = 'Best case')
     plt.plot(min_values, 'r', label = 'Worst case')
+    plt.plot(mean_values_l, 'b', label = 'Mean case')
     plt.legend()
     plt.ylabel('Distancia')
     plt.xlabel('Generacion')
