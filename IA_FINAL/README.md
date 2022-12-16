@@ -15,6 +15,6 @@ https://drive.google.com/drive/u/1/folders/1hGLg3aLGzcM6UlhgzYnn7an_XgVXJTw_
 
 Hacer los cambio a las variables:
 
-path =  "/Users/lsesp/" #nuevo directorio de trabajo
-df=pd.read_csv("IMDB Dataset/IMDB Dataset.csv") # nuevo directorio del dataset
+path =  "/Users/lsesp/" #nuevo directorio de trabajo <br>
+df=pd.read_csv("IMDB Dataset/IMDB Dataset.csv") # nuevo directorio del dataset <br>
 checkpoint_path= "training/cp.ckpt" #nuevo directorio de entrenamiento
