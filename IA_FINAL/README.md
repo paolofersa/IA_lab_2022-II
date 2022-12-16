@@ -1,11 +1,10 @@
 Los requerimientos para los frameworks y librerías utilizadas son:
 
-pip install transformers
-pip install tensorflow
-pip install path.py
-pip install numpy
-pip install pandas
-pip install sklearn
-pip install tqdm
-pip install seaborn
-Todo el código se encuentra subido al siguiente repositorio
+pip install transformers <br>
+pip install tensorflow <br>
+pip install path.py <br>
+pip install numpy <br>
+pip install pandas <br>
+pip install sklearn <br>
+pip install tqdm <br>
+pip install seaborn <br>
